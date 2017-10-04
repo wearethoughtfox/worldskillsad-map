@@ -19,10 +19,10 @@ mapboxgl.accessToken = 'pk.eyJ1Ijoid29ybGRza2lsbHNhYnVkaGFiaTIwMTciLCJhIjoiY2l0b
 var map = new mapboxgl.Map({
     container: 'map', // container id
     style: 'mapbox://styles/mapbox/streets-v9', // stylesheet location
-    center: [54.4367,24.4209], // starting position [lng, lat]
+    center: [54.4347,24.4185], // starting position [lng, lat]
     zoom: 16, // starting zoom
-    minzoom: 15,
-    maxzoom: 22
+    minZoom: 16,
+    maxZoom: 19
 });
 
 map.on('load', function() {
@@ -33,8 +33,8 @@ map.on('load', function() {
       type: 'raster',
       tiles: ['https://api.mapbox.com/v4/worldskillsabudhabi2017.17cuhnww/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoid29ybGRza2lsbHNhYnVkaGFiaTIwMTciLCJhIjoiY2l0bXJ1cG1uMDAxODJ6cnZoMm9zbGV4MyJ9.kZVapMzP758aCk-FjfUnYQ'],
     },
-    minzoom: 15,
-    maxzoom: 22
+    minZoom: 16,
+    maxZoom: 20
   });
 });
 
