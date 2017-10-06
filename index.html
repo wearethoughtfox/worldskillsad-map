@@ -9,11 +9,35 @@
     <style>
         body { margin:0; padding:0; }
         #map { position:absolute; top:0; bottom:0; width:100%; }
+
+        #pop {
+          float:left;
+          width:30%;
+          max-width:250px;
+          min-width: 215px;
+          padding:20px;
+          background:rgba(255,255,255,0.85);
+          position:absolute;
+          top:0;
+          bottom:0;
+          left:0;
+        }
     </style>
 </head>
 <body>
 
-<div id='map'></div>
+<div id="map"></div>
+
+  <div id="pop">
+
+   <a class="close">&times;</a>
+
+    <div id="info">
+      content content content
+    </div>
+
+  </div>
+
 <script>
 mapboxgl.accessToken = 'pk.eyJ1Ijoid29ybGRza2lsbHNhYnVkaGFiaTIwMTciLCJhIjoiY2l0bXJ1cG1uMDAxODJ6cnZoMm9zbGV4MyJ9.kZVapMzP758aCk-FjfUnYQ';
 var map = new mapboxgl.Map({
