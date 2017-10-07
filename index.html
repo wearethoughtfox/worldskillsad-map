@@ -10,7 +10,7 @@
         body { margin:0; padding:0; }
         #map { position:absolute; top:0; bottom:0; width:100%; }
 
-        #pop {
+        #listings {
           float:left;
           width:30%;
           max-width:250px;
@@ -28,14 +28,7 @@
 
 <div id="map"></div>
 
-  <div id="pop">
-
-   <a class="close">&times;</a>
-
-    <div id="info">
-      content content content
-    </div>
-
+  <div id="listings">
   </div>
 
 <script>
@@ -2103,26 +2096,47 @@ map.on('load', function() {
             'fill-outline-color': 'rgba(200, 100, 240, 1)'
         }
   });
+
+  buildLocationList(skills);
 });
 
- map.on('click', 'skills', function (e) {
-        new mapboxgl.Popup()
-            .setLngLat(e.lngLat)
-            .setHTML(e.features[0].properties.name)
-            .addTo(map);
-    });
-
-  map.on('mouseenter', 'skills', function () {
-      map.getCanvas().style.cursor = 'pointer';
+map.on('click', 'skills', function (e) {
+  new mapboxgl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(e.features[0].properties.name)
+      .addTo(map);
   });
 
-  // Change it back to a pointer when it leaves.
-  map.on('mouseleave', 'skills', function () {
-      map.getCanvas().style.cursor = '';
-  });
+map.on('mouseenter', 'skills', function () {
+  map.getCanvas().style.cursor = 'pointer';
+});
+
+// Change it back to a pointer when it leaves.
+map.on('mouseleave', 'skills', function () {
+  map.getCanvas().style.cursor = '';
+});
 
 map.addControl(new mapboxgl.NavigationControl());
 
+function buildLocationList(data) {
+  for (i = 0; i < data.features.length; i++) {
+    var currentFeature = data.features[i];
+    var prop = currentFeature.properties;
+
+    var listings = document.getElementById('listings');
+    var listing = listings.appendChild(document.createElement('div'));
+    listing.className = 'item';
+    listing.id = 'listing-' + i;
+
+    var link = listing.appendChild(document.createElement('a'));
+    link.href = '#';
+    link.className = 'title';
+    link.dataPosition = i;
+    link.innerHTML = prop.name;
+    var details = listing.appendChild(document.createElement('div'));
+    details.innerHTML = prop.sector;
+   }
+}
 
 </script>
 
