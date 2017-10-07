@@ -6,22 +6,41 @@
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.40.1/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.40.1/mapbox-gl.css' rel='stylesheet' />
+     <script src='https://api.mapbox.com/mapbox.js/plugins/turf/v2.0.2/turf.min.js'></script>
     <style>
         body { margin:0; padding:0; }
         #map { position:absolute; top:0; bottom:0; width:100%; }
 
         #listings {
-          float:left;
-          width:30%;
-          max-width:250px;
-          min-width: 215px;
-          padding:20px;
+          width: 100%;
+          position: absolute;
           background:rgba(255,255,255,0.85);
-          position:absolute;
-          top:0;
-          bottom:0;
-          left:0;
+          height: 40vh;
+          bottom: 0;
         }
+
+        .active {
+          background-color: black;
+        }
+
+        @media screen and (min-width: 48em) {
+          #listings {
+            float: left;
+            width: 30%;
+            height: 100%;
+            max-width:250px;
+            min-width: 215px;
+            padding:20px;
+            background:rgba(255,255,255,0.85);
+            position:absolute;
+            top:0;
+            bottom:0;
+            left:0;
+        }
+      }
+
+
+
     </style>
 </head>
 <body>
@@ -2092,8 +2111,7 @@ map.on('load', function() {
             'data': skills,
           },
         'paint': {
-            'fill-color': 'rgba(200, 100, 240, 0.4)',
-            'fill-outline-color': 'rgba(200, 100, 240, 1)'
+            'fill-color': 'rgba(200, 100, 240, 0.4)'
         }
   });
 
@@ -2101,11 +2119,36 @@ map.on('load', function() {
 });
 
 map.on('click', 'skills', function (e) {
-  new mapboxgl.Popup()
-      .setLngLat(e.lngLat)
-      .setHTML(e.features[0].properties.name)
-      .addTo(map);
-  });
+  var features = map.queryRenderedFeatures(e.point, { layers: ['skills'] });
+
+ if (features.length) {
+    var feature = features[0];
+    console.log (feature.geometry.coordinates);
+
+    var clickedPoint = turf.center(feature);
+
+    // 1. Fly to the point
+    flyToStore(clickedPoint);
+    // 2. Close all other popups and display popup for clicked store
+    createPopUp(feature);
+    // 3. Highlight listing in sidebar (and remove highlight for all other listings)
+    var activeItem = document.getElementsByClassName('active');
+    if (activeItem[0]) {
+      activeItem[0].classList.remove('active');
+    }
+    // Find the index of the store.features that corresponds to the clickedPoint that fired the event listener
+    var selectedFeature = feature.properties.name;
+
+    for (var i = 0; i < skills.features.length; i++) {
+      if (skills.features[i].properties.name === selectedFeature) {
+        selectedFeatureIndex = i;
+      }
+    }
+    // Select the correct list item using the found index and add the active class
+    var listing = document.getElementById('listing-' + selectedFeatureIndex);
+    listing.classList.add('active');
+  }
+});
 
 map.on('mouseenter', 'skills', function () {
   map.getCanvas().style.cursor = 'pointer';
@@ -2135,8 +2178,45 @@ function buildLocationList(data) {
     link.innerHTML = prop.name;
     var details = listing.appendChild(document.createElement('div'));
     details.innerHTML = prop.sector;
+
+    link.addEventListener('click', function(e) {
+      var clickedListing = data.features[this.dataPosition];
+      var center = turf.center(clickedListing);
+      flyToStore(center);
+      createPopUp(clickedListing);
+
+       var activeItem = document.getElementsByClassName('active');
+      if (activeItem[0]) {
+        activeItem[0].classList.remove('active');
+      }
+      this.parentNode.classList.add('active');
+    });
+
    }
+
 }
+
+function flyToStore(currentFeature) {
+  map.flyTo({
+    center: currentFeature.geometry.coordinates,
+    zoom: 19
+  });
+}
+
+function createPopUp(currentFeature) {
+  var popUps = document.getElementsByClassName('mapboxgl-popup');
+  // Check if there is already a popup on the map and if so, remove it
+  if (popUps[0]) popUps[0].remove();
+
+  var center = turf.center(currentFeature);
+  var popup = new mapboxgl.Popup({ closeOnClick: false })
+    .setLngLat(center.geometry.coordinates)
+    .setHTML('<h4>' + currentFeature.properties.id + '</h4>' +
+      '<h4>' + currentFeature.properties.name + '</h4>')
+    .addTo(map);
+
+}
+
 
 </script>
 
